@@ -6,6 +6,8 @@ import models.UserResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+
 public class UserManagementApiTests extends BaseTest {
 
     @Test(priority = 1)
@@ -14,8 +16,15 @@ public class UserManagementApiTests extends BaseTest {
         UserRequest request = new UserRequest("Seema", "SDET");
 
         Response response = userApiClient.createUser(request);
-        System.out.println(response.asPrettyString());
+
+        response.then().log().all();
+
         Assert.assertEquals(response.getStatusCode(), 201);
+
+        // JSON Schema Validation
+        response.then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/createUserSchema.json"));
 
         UserResponse userResponse = response.as(UserResponse.class);
 
@@ -24,15 +33,21 @@ public class UserManagementApiTests extends BaseTest {
 
         Assert.assertNotNull(userResponse.getId());
         Assert.assertNotNull(userResponse.getCreatedAt());
-
     }
 
     @Test(priority = 2)
     public void testGetUser() {
 
         Response response = userApiClient.getUser(2);
-        System.out.println(response.asPrettyString());
+
+        response.then().log().all();
+
         Assert.assertEquals(response.getStatusCode(), 200);
+
+        // JSON Schema Validation
+        response.then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/getUserSchema.json"));
 
         Assert.assertEquals(
                 response.jsonPath().getString("data.first_name"),
@@ -41,7 +56,6 @@ public class UserManagementApiTests extends BaseTest {
         Assert.assertEquals(
                 response.jsonPath().getString("data.last_name"),
                 "Weaver");
-
     }
 
     @Test(priority = 3)
@@ -50,8 +64,15 @@ public class UserManagementApiTests extends BaseTest {
         UserRequest request = new UserRequest("Seema", "Senior SDET");
 
         Response response = userApiClient.updateUser(2, request);
-        System.out.println(response.asPrettyString());
+
+        response.then().log().all();
+
         Assert.assertEquals(response.getStatusCode(), 200);
+
+        // JSON Schema Validation
+        response.then()
+                .assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/updateUserSchema.json"));
 
         UserResponse userResponse = response.as(UserResponse.class);
 
@@ -59,16 +80,15 @@ public class UserManagementApiTests extends BaseTest {
         Assert.assertEquals(userResponse.getJob(), "Senior SDET");
 
         Assert.assertNotNull(userResponse.getUpdatedAt());
-
     }
 
     @Test(priority = 4)
     public void testDeleteUser() {
 
         Response response = userApiClient.deleteUser(2);
-        System.out.println(response.asPrettyString());
+
+        response.then().log().all();
+
         Assert.assertEquals(response.getStatusCode(), 204);
-
     }
-
 }

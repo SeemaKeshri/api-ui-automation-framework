@@ -53,4 +53,5 @@ public class UserResponse {
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
