@@ -15,6 +15,7 @@ public class ApiBase {
         request = RestAssured
                 .given()
                 .header("Content-Type", "application/json")
-                .header("Accept", "application/json");
+                .header("Accept", "application/json")
+                .header("x-api-key", ConfigReader.getProperty("api.key"));
     }
 }
